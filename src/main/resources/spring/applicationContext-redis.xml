@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd"
+       default-lazy-init="false">
+    
+    <!-- 开启spring注解扫描 -->
+    <context:component-scan base-package="com.feizi.distribute.lock.redis.ioc"/>
+
+    <!-- 加载配置文件 -->
+    <context:property-placeholder location="classpath:config/redis.properties" ignore-unresolvable="true"/><!---->
+
+    <!--<bean id="redisPropertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="order" value="2"/>
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="locations">
+            <list>
+                <value>classpath:config/redis.properties</value>
+            </list>
+        </property>
+        <property name="fileEncoding" value="UTF-8"/>
+    </bean>-->
+
+    <!-- 配置JedisPoolConfig实例 -->
+    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <!-- 最大连接数，默认8个 -->
+        <property name="maxTotal" value="${redis.pool.maxActive}"/>
+        <!-- 最大空闲连接数，默认8个 -->
+        <property name="maxIdle" value="${redis.pool.maxIdle}"/>
+        <!-- 获取连接时的最大等待毫秒数(如果设置为阻塞时BlockWhenExhausted),如果超时就抛异常, 小于零:阻塞不确定的时间,  默认-1-->
+        <property name="maxWaitMillis" value="${redis.pool.maxWait}"/>
+        <!-- 获取连接的时候检查有效性, 默认false -->
+        <property name="testOnBorrow" value="${redis.pool.testOnBorrow}"/>
+        <!-- 归还连接的时候检查有效性，默认false -->
+        <property name="testOnReturn" value="${redis.pool.testOnReturn}"/>
+    </bean>
+
+    <!-- 配置jedisPool连接池 -->
+    <bean id="jedisPool" class="redis.clients.jedis.JedisPool">
+        <!-- 连接池配置实例 -->
+        <constructor-arg name="poolConfig" ref="jedisPoolConfig"/>
+        <!-- redis连接主机IP -->
+        <constructor-arg name="host" value="${redis.host}"/>
+        <!-- redis连接端口 -->
+        <constructor-arg name="port" value="${redis.port}"/>
+        <!-- redis连接超时时间 -->
+        <constructor-arg name="timeout" value="${redis.timeout}"/>
+        <!-- redis密码 -->
+        <!--<constructor-arg name="password" value="${redis.password}"/>-->
+    </bean>
+</beans>
